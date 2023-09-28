@@ -11,6 +11,7 @@
 	</head>
 	<body>
 		{% include "Blog/blogNavBar.html" %}
+		{% include "message.html"%}
 		<div class="container-md">
 			<div class="feed-search">
 				<h1>
@@ -28,16 +29,20 @@
 					</form>
 				</div>
 			</div>
-			{% for blog in Blogs%}
-			<div class="container-sm container">
-				<h2><a href="{% url "blogPage" id=blog.ID %}">{{ blog.title }}</a></h2>
-				<div class="little">
-					<div>Created By: {{ blog.author.username }}</div>
-					<div>Created At: {{blog.created_at}}</div>
+			{% if SearchEmpty %}
+				<p class="text-center text-body-secondary fs-3">Sorry, No Blog Found</p>
+			{% else %}
+				{% for blog in Blogs%}
+				<div class="container-sm container">
+					<h2><a href="{% url "blogPage" id=blog.ID %}">{{ blog.title }}</a></h2>
+					<div class="little">
+						<div>Created By: {{ blog.author.username }}</div>
+						<div>Created At: {{blog.created_at}}</div>
+					</div>
 				</div>
-			</div>
-			<a href="{% url "createBlog" %}" class="create-post-btn">Create a Post</a>
-			{% endfor %}
+				<a href="{% url "createBlog" %}" class="create-post-btn">Create a Post</a>
+				{% endfor %}
+			{% endif %}
 		</div>
 		{% include "Blog/footer.html" %}
 	</body>

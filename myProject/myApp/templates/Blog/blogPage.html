@@ -12,6 +12,7 @@
 	</head>
 	<body>
 		{% include "Blog/blogNavBar.html" %}
+		{% include "message.html"%}
 		<div class="container-sm container">
 			<div class="header">
 				<h1>{{Blog.title}}</h1> 
@@ -63,7 +64,30 @@
       <div class="container-sm container">
 			<div class="little">
 				<h5>{{ comment.user.username }}</h5>
-				<div>{{ comment.created_at }}</div>
+				<div>
+					{{ comment.created_at }}
+					{% if request.user == comment.user %}
+					<span class="dropdown">
+						<button class="btn btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+								<path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+							</svg>
+						</button>
+						<ul class="dropdown-menu">
+							<li>
+								<a 
+									class="dropdown-item dropdown-item-delete" 
+									style="color:red" 
+									href="{% url "deleteComment" id=comment.ID blog_id=Blog.ID %}" 
+									onclick="return confirm('Are you sure you want to delete this comment?\n{{comment.content}}');"
+								>
+									Delete
+								</a>
+							</li>
+						</ul>
+					</span>
+					{% endif %}
+			</div>
 			</div>
 			<hr />
 			<div class="content">
@@ -73,5 +97,7 @@
       {% endfor %}
 		</div>
 		{% include "Blog/footer.html" %}
+		<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 	</body>
 </html>

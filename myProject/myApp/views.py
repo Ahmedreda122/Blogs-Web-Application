@@ -70,6 +70,7 @@ def createBlog(request):
                 )   
                 # Save the post data into the DB
                 blog.save()
+                messages.success(request, "Your Blog Post has been posted Successfully :)")
                 return redirect("showBlogs")
         else:
             # Get Django Post Form Created in forms.py
@@ -83,12 +84,15 @@ def createBlog(request):
     
 def showBlogs(request):
     if request.user.is_authenticated:
+        SearchEmpty = False
         if request.method == 'POST' and  request.POST['search']:
             blogs = Blog.objects.filter(title__icontains=request.POST['search'])
+            if not blogs:
+                SearchEmpty = True
         else:    
             # Get blogs Objects from Blog Model ordered by creation date and time in descending order
             blogs = Blog.objects.all().order_by("-created_at")
-        context = {"Blogs": blogs} 
+        context = {"Blogs": blogs, "SearchEmpty": SearchEmpty} 
         # Render home page with help of context data (the Dynamic content)          
         return render(request, "Blog/home.html", context)  
     else:
@@ -116,6 +120,7 @@ def addComment(request, blog_id):
             )   
             # Save the post data into the DB
             _comment.save()
+            messages.info(request, "Your Comment has been Added Successfully :)")
         return redirect("blogPage", id=blog_id)
     else:
         return redirect("login")      
@@ -133,6 +138,7 @@ def editBlog(request, blog_id):
                 # The `save()` method will automatically handle the update operation 
                 # and persist the changes to the database. 
                 form.save()
+                messages.success(request, "Your Blog has been Edited Successfully.")
                 return redirect("blogPage", id=blog_id)
         else:
             # Get Django Blog Form Created in forms.py and apply old values to its fields
@@ -148,20 +154,32 @@ def deleteBlog(request, blog_id):
     if request.user.is_authenticated:
         obj = Blog.objects.get(ID=blog_id)
         obj.delete()
+        messages.info(request, "Your Blog Deleted Successfully.")
         return redirect("showBlogs")
     else:
         return redirect("login")    
     
-    
 def myBlogs(request):
     if request.user.is_authenticated:
+        SearchEmpty = False
         if request.method == 'POST' and  request.POST['search']:
             blogs = Blog.objects.filter(author=request.user ,title__icontains=request.POST['search'])
+            if not blogs:
+                SearchEmpty = True            
         else:    
             # Get blogs Objects from Blog Model ordered by creation date and time in descending order
             blogs = Blog.objects.filter(author=request.user).order_by("-created_at")
-        context = {"Blogs": blogs, "isMyPostsPage" : True} 
+        context = {"Blogs": blogs, "isMyPostsPage" : True, "SearchEmpty": SearchEmpty} 
         # Render home page with help of context data (the Dynamic content)          
         return render(request, "Blog/home.html", context)  
+    else:
+        return redirect("login")
+    
+def deleteComment(request, id, blog_id):
+    if request.user.is_authenticated:
+        obj = Comment.objects.get(ID=id)
+        obj.delete()
+        messages.info(request, "Your Comment Deleted Successfully.")
+        return redirect("blogPage", id=blog_id)
     else:
         return redirect("login")
